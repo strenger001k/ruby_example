@@ -1,0 +1,40 @@
+:ruby
+  updatable_id ||= nil
+  options ||= {}
+  order_options = options[:order]
+  filter_keys = search_filter_keys(fields, options[:range])
+  filter_keys |= order_options[:params].values if order_options
+  dataset = {
+    controller: 'search',
+    action:,
+    method:,
+    updatable_id:,
+    filter_keys: filter_keys.to_json
+  }
+
+.data-search{ data: dataset }
+  %form.data-search_form{ data: { component: 'form', action: 'submit|submit' } }
+    .data-search_fieldset
+      - fields.each do |key, data|
+        - input_options = { id: key, tag: data[:tag] ||= :input, type: data[:type], value: data[:value], values: data[:values] }
+        .data-search_field{ class: key }
+          .data-search_field_label
+            .data-search_field_caption= t(key)
+            - if order_options
+              .data-search_field_order
+                - order_options[:directions].each do |direction|
+                  :ruby
+                    args = { order_options[:params][:key] => key, order_options[:params][:direction] => direction }
+                    order_btn_dataset = { action: "click|submit|#{args.to_json}", toggle: 1 }
+                  .data-search_field_order-btn{ class: direction, data: order_btn_dataset }
+          .data-search_field_input
+            - if data[:range]
+              - options[:range]&.each do |range_item|
+                - input_options[:id] = "#{key}_#{range_item}"
+                - input_options[:value] = input_options[:values]&.[](range_item)
+                = render search_template(:input), input_options
+            - else
+              = render search_template(:input), input_options
+    .data-search_buttons.data-tree_buttons
+      %button.data-search_submit.data-tree_button.icon.search
+      .data-search_reset.data-tree_button.icon.close{ data: { action: 'click|reset' } }

@@ -1,0 +1,16 @@
+:ruby
+  attrs = {
+    name: id,
+    class: ['data-search_form-element', tag, id],
+    id:,
+    type:,
+    value:
+  }
+  keyed_values = values.is_a?(Hash)
+
+= content_tag tag, attrs do
+  - if tag == :select && values
+    %option
+    - values.each do |option_value, option_label|
+      - option_label = option_value unless keyed_values
+      %option{ value: option_value, selected: option_value.to_s == value.to_s }= option_label

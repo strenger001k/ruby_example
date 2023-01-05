@@ -1,0 +1,26 @@
+.page-head
+  .page-title= I18n.t('page_title.users')
+  %a.page-head_button{ href: new_user_path }= I18n.t('create')
+
+.site-table-container
+  = render(template: search_template, locals: search_form)
+
+  .site-table#users-list
+    .site-table_head
+      .site-table_cell= I18n.t('id')
+      .site-table_cell= I18n.t('name')
+      .site-table_cell= I18n.t('email')
+      .site-table_cell= I18n.t('role')
+      .site-table_cell= I18n.t('discarded')
+    - users.each do |user|
+      .site-table_row
+        .site-table_cell= user.id
+        .site-table_cell= user.name
+        .site-table_cell= user.email
+        .site-table_cell= user.role_name
+        .site-table_cell= user.discarded_at
+        = action_buttons(view_url: user_path(user),
+                        edit_url: edit_user_path(user),
+                        undiscard_url: user.discarded_at && undiscard_user_path(user),
+                        update_id: search_form[:updatable_id],
+                        confirm_text: I18n.t('confirm_action'))
